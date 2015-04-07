@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hdr by KKyang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Hdr</h1>
+      <h2 class="project-tagline">NTU VFX Project 1</h2>
+      <a href="https://github.com/KKyang/HDR" class="btn">View on GitHub</a>
+      <a href="https://github.com/KKyang/HDR/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/KKyang/HDR/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="台灣大學-數位視覺效果-project-1-high-dynamic-range-imaging" class="anchor" href="#%E5%8F%B0%E7%81%A3%E5%A4%A7%E5%AD%B8-%E6%95%B8%E4%BD%8D%E8%A6%96%E8%A6%BA%E6%95%88%E6%9E%9C-project-1-high-dynamic-range-imaging" aria-hidden="true"><span class="octicon octicon-link"></span></a>台灣大學 數位視覺效果 Project 1 High Dynamic Range Imaging</h2>
+
+<p><strong>R03631012</strong> 黃揚文 <strong>R03631014</strong> 徐嘉君</p>
+
+<p>因為相機所能能拍攝到明暗亮度範圍有限，不能拍攝到如我們人眼所看到的光線範圍。HDR ( High Dynamic Range Imaging ) 可以藉由不同曝光時間的相片來生成具有高動態範圍的影像。使得影像更接近我們人眼實際看到的東西。本專案為台灣大學數位視覺效果課程之HDR課題練習。</p>
+
+<h3>
+<a id="使用相機" class="anchor" href="#%E4%BD%BF%E7%94%A8%E7%9B%B8%E6%A9%9F" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用相機</h3>
+
+<p>本專題使用的相機為Nikon D3200，鏡頭為kit鏡 (AF-S NIKKOR 18-55mm 1:3.5-5.6G)</p>
+
+<h3>
+<a id="開發環境" class="anchor" href="#%E9%96%8B%E7%99%BC%E7%92%B0%E5%A2%83" aria-hidden="true"><span class="octicon octicon-link"></span></a>開發環境</h3>
+
+<p>Visual Studio 2013 Pro
+Qt 5.4</p>
+
+<h3>
+<a id="實作方法" class="anchor" href="#%E5%AF%A6%E4%BD%9C%E6%96%B9%E6%B3%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>實作方法</h3>
+
+<h4>
+<a id="事前校準" class="anchor" href="#%E4%BA%8B%E5%89%8D%E6%A0%A1%E6%BA%96" aria-hidden="true"><span class="octicon octicon-link"></span></a>事前校準</h4>
+
+<p>雖然HDR的照片因為相機在同樣地點、情況下拍攝不同的多組曝光時間不同的照片，但因為仍會有手震和快門造成的些微動作，所以藉由Alignment可以將這些些微的震動經由稍微移動照片來消除。本專題採用的為上課介紹的Median Threshold Bitmap作校準，本演算法利用影像金字塔的方式(每層圖片都為上一層的四倍)從最小的開始比對，在九宮格內做移動如下圖所示，累計個方向的誤差選擇最小的方向移動之。</p>
+
+<table>
+<thead>
+<tr>
+<th>(-1, -1)</th>
+<th>(0, -1)</th>
+<th>(1, -1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(-1, 0)</strong></td>
+<td><strong>(0, 0)</strong></td>
+<td><strong>(1, 0)</strong></td>
+</tr>
+<tr>
+<td><strong>(-1, 1 )</strong></td>
+<td><strong>(0, 1)</strong></td>
+<td><strong>(1, 1)</strong></td>
+</tr>
+</tbody>
+</table>
+
+<h4>
+<a id="建立hdr影像" class="anchor" href="#%E5%BB%BA%E7%AB%8Bhdr%E5%BD%B1%E5%83%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>建立HDR影像</h4>
+
+<p>在建立HDR影像以前利用<strong>exif</strong>這個函式庫直接讀取由相機拍出的JPG影像的曝光時間。本專題建立HDR影像的方法為上課介紹的Debevec方法，並且將論文的gsolve為基底轉成C++程式碼，用OpenCV提供的 <code>cv::solve()</code> SVD解 Ax = b方程解，得到響應曲線。最後再將輸入的所有影像的每個點帶入該曲線並乘上權重，最後得到radiance map。</p>
+
+<h4>
+<a id="tone-mapping" class="anchor" href="#tone-mapping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tone Mapping</h4>
+
+<p>因為HDR影像不一定為一般影像中0-255的範圍區間，因此需要轉換成一般圖片格式，許多演算法都要求必須先算出其亮度(intensity)，再算出答案。本專題採用兩種方法做試驗，第一個為Durand，另一個為Reinhard</p>
+
+<p><strong>Reinhard</strong></p>
+
+<p>Reinhard先計算了該HDR影像的亮度平均，再套用自定義的白平衡修正，最後再將修正過後的與亮度相除得到一個scale factor，最後再將此矩陣與HDR影像相乘即可得到答案。</p>
+
+<p><strong>Durand</strong></p>
+
+<p>Durand在其個人網頁中有很詳細的步驟</p>
+
+<pre><code>input intensity= 0.2126 * R + 0.7152 * G + 0.0722 * B
+r=R/(input intensity), g=G/(input intensity), B=B/(input intensity)
+log(base)=Bilateral(log(input intensity))
+log(detail)=log(input intensity)-log(base)
+log (output intensity)=log(base)*compressionfactor+log(detail)
+output = r*log_absolute_scale*10^(log(output intensity))
+
+//Parameters
+compressionfactor = (log(5) / log(10.0)) /(max(log(base)) - min(log(base)))
+log_absolute_scale = 1.0 / pow(10.0, compression_factor * max_log);
+</code></pre>
+
+<p>其中的雙線濾波器我們使用的是OpenCV提供的雙線濾波，並使用作者提供的參數做設定取出圖片的細節，在計算過顏色後再將細節還原回去。</p>
+
+<h4>
+<a id="結果" class="anchor" href="#%E7%B5%90%E6%9E%9C" aria-hidden="true"><span class="octicon octicon-link"></span></a>結果</h4>
+
+<p>以下為利用本專題撰寫程式之結果</p>
+
+<table>
+<thead>
+<tr>
+<th>Durand</th>
+<th>Reinhard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="https://github.com/KKyang/HDR/blob/master/test_image/1/result/Durand.png" alt="Durand 1"></td>
+<td><img src="https://github.com/KKyang/HDR/tree/master/test_image/1/result/Reinhard.png" alt="Reinhard 1"></td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="作者" class="anchor" href="#%E4%BD%9C%E8%80%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>作者</h3>
+
+<p>黃揚文 (<a href="https://github.com/KKyang" class="user-mention">@KKyang</a>)
+徐嘉君 (<a href="https://github.com/Chia-ChunHsu" class="user-mention">@Chia-ChunHsu</a>)</p>
+
+<h3>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+
+<p>可以利用Github提供的issues功能提供我們意見，謝謝!</p>
+
+<h3>
+<a id="reference" class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h3>
+
+<ol>
+<li>Paul E. Debevec, Jitendra Malik, Recovering High Dynamic Range Radiance Maps from Photographs, SIGGRAPH 1997</li>
+<li>Fredo Durand, Julie Dorsey, Fast Bilateral Filtering for the Display of High Dynamic Range Images, SIGGRAPH 2002</li>
+<li>Reinhard, E., Stark, M., Shirley, P., and Ferwerda, J.A. Photographic tone reproduction for digital images, SIGGRAPH 2002</li>
+<li>課程講義(MTB, HDR, Tone mapping)</li>
+</ol>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/KKyang/HDR">Hdr</a> is maintained by <a href="https://github.com/KKyang">KKyang</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
