@@ -15,3 +15,6 @@ V1.0.0 已經釋出，可以從Github的release頁面下載
 在圖片生成後對圖片點擊右鍵可以儲存圖片(可以自選儲存位置)
 
 在Files裡面則可以選擇儲存HDR圖片，位置會儲存在與程式相同目錄中(不可自選位置)
+
+安裝Visual Studio 2013可轉散發套件方可執行程式
+http://www.microsoft.com/zh-tw/download/details.aspx?id=40784
