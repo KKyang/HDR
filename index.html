@@ -24,7 +24,7 @@
 
 <p><strong>R03631012</strong> 黃揚文 <strong>R03631014</strong> 徐嘉君</p>
 
-<p>因為相機所能能拍攝到明暗亮度範圍有限，不能拍攝到如我們人眼所看到的光線範圍。HDR ( High Dynamic Range Imaging ) 可以藉由不同曝光時間的相片來生成具有高動態範圍的影像。使得影像更接近我們人眼實際看到的東西。本專案為台灣大學數位視覺效果課程之HDR課題練習。</p>
+<p>雖然HDR的照片應為相機在同樣地點、情況下拍攝多組曝光時間不同的照片，但因為仍會有手震和快門造成的些微震動，所以藉由Alignment可以將這些些微的震動經由稍微移動照片來消除。本專題採用的為上課介紹的MTB ( Median Threshold Bitmap ) 作校準，本演算法利用影像金字塔的方式(每層圖片都為上一層的四倍)從最小的開始比對，在九宮格內做移動如下圖所示，累計個方向的誤差選擇最小的方向移動之。相較於 尋找Gradient 的作法，較不容易受到不同曝光時間所影像edge的截取。</p>
 
 <h3>
 <a id="使用相機" class="anchor" href="#%E4%BD%BF%E7%94%A8%E7%9B%B8%E6%A9%9F" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用相機</h3>
@@ -72,7 +72,7 @@
 <h4>
 <a id="建立hdr影像" class="anchor" href="#%E5%BB%BA%E7%AB%8Bhdr%E5%BD%B1%E5%83%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>建立HDR影像</h4>
 
-<p>在建立HDR影像以前利用<strong>exif</strong>這個函式庫直接讀取由相機拍出的JPG影像的曝光時間。本專題建立HDR影像的方法為上課介紹的Debevec方法，並且將論文的gsolve為基底轉成C++程式碼，用OpenCV提供的 <code>cv::solve()</code> SVD解 Ax = b方程解，得到響應曲線。最後再將輸入的所有影像的每個點帶入該曲線並乘上權重，最後得到radiance map。</p>
+<p>在建立HDR影像以前利用<strong>easyexif</strong> (<a href="https://github.com/mayanklahiri/easyexif">https://github.com/mayanklahiri/easyexif</a> )網路的現成函式庫直接讀取影像的曝光時間。本專題建立HDR影像的方法為上課介紹的Debevec方法，並且將以論文的gsolve MatLab Code為基底轉成C++程式碼，再利用OpenCV提供的 <code>cv::solve()</code> SVD解 Ax = b 方程解，得到響應曲線 (Recovering response curve)。最後再將所有輸入影像的每個點代入該曲線並乘上權重，最後得到radiance map。</p>
 
 <h4>
 <a id="tone-mapping" class="anchor" href="#tone-mapping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tone Mapping</h4>
@@ -99,7 +99,7 @@ compressionfactor = (log(5) / log(10.0)) /(max(log(base)) - min(log(base)))
 log_absolute_scale = 1.0 / pow(10.0, compression_factor * max_log);
 </code></pre>
 
-<p>其中的雙線濾波器我們使用的是OpenCV提供的雙線濾波，並使用作者提供的參數做設定取出圖片的細節，在計算過顏色後再將細節還原回去。</p>
+<p>其中的雙線濾波器 (Bilinear filter)，我們使用的是OpenCV提供的雙線濾波，並使用作者提供的參數做設定取出圖片的細節，在計算過顏色後，再將細節還原回去。</p>
 
 <h4>
 <a id="結果" class="anchor" href="#%E7%B5%90%E6%9E%9C" aria-hidden="true"><span class="octicon octicon-link"></span></a>結果</h4>
