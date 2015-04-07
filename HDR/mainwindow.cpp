@@ -19,6 +19,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::uiControl(bool s)
+{
+    ui->groupBox_hdrProperties->setEnabled(s);
+    ui->pushButton_hdr->setEnabled(s);
+}
+
 void MainWindow::on_pushButton_hdr_clicked()
 {
     if(images.size() < 2)
@@ -27,8 +33,7 @@ void MainWindow::on_pushButton_hdr_clicked()
         return;
     }
 
-    ui->groupBox_hdrProperties->setEnabled(false);
-    ui->pushButton_hdr->setEnabled(false);
+    uiControl(false);
 
     ui->textBrowser_log->append("==============");
     HDR hdr;
@@ -67,6 +72,7 @@ void MainWindow::on_pushButton_hdr_clicked()
     {
         ui->textBrowser_log->append("Start creating tone mapping (Reinhard)");
         cv::Mat rei;
+
         hdr.toneMappingReinhard(_hdr, rei);
         if(ui->checkBox_gammaC->isChecked())
         {
@@ -84,11 +90,9 @@ void MainWindow::on_pushButton_hdr_clicked()
         tone_image = rei.clone();
     }
 
+    uiControl(true);
     ui->textBrowser_log->append("Done");
     ui->textBrowser_log->append("==============");
-
-    ui->groupBox_hdrProperties->setEnabled(true);
-    ui->pushButton_hdr->setEnabled(true);
     disconnect(&hdr, SIGNAL(sendProgress(QString&,int)), this, SLOT(progressBarStatus(QString&,int)));
 }
 

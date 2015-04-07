@@ -36,6 +36,7 @@ private slots:
     void on_actionSave_hdr_triggered();
 
 private:
+    void uiControl(bool s);
     Ui::MainWindow *ui;
     QProgressBar *progressBar;
 
